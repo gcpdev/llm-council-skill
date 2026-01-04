@@ -6,9 +6,12 @@ A Claude skill that enables collaborative brainstorming with multiple AI models 
 
 When you ask Claude to consult with other AI models, Claude will:
 1. Query both ChatGPT and Gemini for their perspectives
-2. Analyze their responses and identify valuable insights
-3. Synthesize a comprehensive implementation plan incorporating ideas from all three models
-4. Present the final plan with attribution to each model's contributions
+   <img width="607" height="210" alt="council_demo" src="https://github.com/user-attachments/assets/6e2a759d-40cc-4bc2-9651-a74aca651303" />
+3. Analyze their responses and identify valuable insights
+4. Synthesize a comprehensive implementation plan incorporating ideas from all three models
+5. Present the final plan with attribution to each model's contributions
+   <img width="608" height="222" alt="council_demo2" src="https://github.com/user-attachments/assets/327893bd-9806-4cfb-85df-538649c978fa" />
+
 
 ## How to Use
 
