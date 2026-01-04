@@ -21,6 +21,8 @@ Simply ask Claude to consult with other AI models using phrases like:
 - "**Ask ChatGPT and Gemini** what they think about my database design"
 - "**Get perspectives from other AI models** on this technical decision"
 - "**Consult with other LLMs:** What's the best approach for..."
+   <img width="609" height="79" alt="council_demo3" src="https://github.com/user-attachments/assets/ba98d179-08be-4cc8-ac6a-0e1bc69b3fc7" />
+
 
 **Example:**
 ```
