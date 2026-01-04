@@ -47,13 +47,10 @@ Claude will then:
 **Upgrade Options for Better Collaboration:**
 
 **OpenAI models (ordered by capability):**
-- `gpt-4.1-mini` - Fast, capable for everyday tasks
-- `gpt-4o` - Strong general-purpose model
-- `gpt-5-mini` - Advanced GPT-5 family, efficient
-- `gpt-5` - Most capable general-purpose model
-- `gpt-5.2` - State-of-the-art for professional knowledge work
-- `o4-mini` - Fast reasoning for complex problems
-- `o3` - Advanced reasoning for challenging tasks
+- `gpt-5-nano` - Fastest, cheapest version of GPT-5. It's great for summarization and classification tasks. (Default)
+- `gpt-5-mini` - Balanced cost and quality
+- `gpt-5.2` - Smart model, capable of most tasks
+- `gpt-5.2-pro` - State-of-the-art for professional knowledge work
 
 **Gemini models (ordered by capability):**
 - `gemini-2.5-flash-lite` - Ultra-fast, optimized for throughput
@@ -64,16 +61,16 @@ Claude will then:
 **How to Configure:**
 Add these lines to your `.env` file:
 ```
-OPENAI_MODEL=gpt-5
+OPENAI_MODEL=gpt-5-nano
 GEMINI_MODEL=gemini-3-flash-preview
 ```
 
 **Recommended Configurations:**
-- **Budget**: Defaults (`gpt-5-nano-2025-08-07` + `gemini-3-flash-preview`)
-- **Balanced**: `gpt-5-mini` + `gemini-2.5-flash`
+- **Balanced**: Defaults (`gpt-5-nano` + `gemini-3-flash-preview`)
+- **Budget**: `gpt-5-nano` + `gemini-2.5-flash`
 - **High Quality**: `gpt-5` + `gemini-3-flash-preview`
-- **Premium Reasoning**: `o3` + `gemini-3-pro-preview`
-- **Professional Work**: `gpt-5.2` + `gemini-3-pro-preview`
+- **Premium Reasoning**: `gpt-5.2` + `gemini-3-pro-preview`
+- **Professional Work**: `gpt-5.2-pro` + `gemini-3-pro-preview`
 
 ## Benefits
 
@@ -88,19 +85,14 @@ Both OpenAI and Gemini APIs have usage costs that vary significantly by model:
 **OpenAI Cost Tiers (approximate, check current pricing):**
 
 *Budget Tier:*
-- `gpt-5-nano-2025-08-07`: Very low cost per token
-- `gpt-4.1-mini`: Low cost, efficient
-
+- `gpt-5-nano`: Very low cost per token
+- 
 *Standard Tier:*
-- `gpt-4o`: Moderate cost
 - `gpt-5-mini`: Moderate cost
-- `gpt-4.1`: Moderate cost
 
 *Premium Tier:*
-- `gpt-5`: Higher cost per token
-- `gpt-5.2`: Premium pricing for professional work
-- `o4-mini`: Moderate-high cost for reasoning
-- `o3`: Highest cost for advanced reasoning
+- `gpt-5.2`: Higher cost per token
+- `gpt-5.2-pro`: Highest cost for professional work
 
 **Gemini Cost Tiers (approximate, check current pricing):**
 
@@ -116,7 +108,7 @@ Both OpenAI and Gemini APIs have usage costs that vary significantly by model:
 
 **Cost Management Tips:**
 - Start with default models for routine brainstorming (very cost-effective)
-- Use mid-tier models (`gpt-5-mini` + `gemini-2.5-flash`) for balanced quality/cost
+- Use mid-tier models (`gpt-5-mini` + `gemini-3-flash-preview`) for balanced quality/cost
 - Upgrade to premium models only for critical architectural decisions or complex reasoning tasks
 - Set usage limits in your API dashboards (OpenAI Platform and Google AI Studio)
 - Consider setting monthly budgets to avoid surprises
