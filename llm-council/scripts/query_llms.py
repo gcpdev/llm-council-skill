@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 """
 Query multiple LLMs (Gemini and ChatGPT) for their perspectives on a given prompt.
-Uses environment variables for API keys.
+
+Priority order:
+1. CLI tools (gemini-cli, codex) - preferred for token efficiency
+2. API calls - fallback when CLIs are unavailable
+
+Uses environment variables for API keys (only needed if CLI fallback is required).
 """
 
 import os
 import sys
 import json
-from typing import Dict, Optional
+import shutil
+import subprocess
+from typing import Dict, Optional, Tuple
 import requests
 
 
@@ -25,6 +32,55 @@ def load_env_file(env_path: str = ".env") -> Dict[str, str]:
                 env_vars[key.strip()] = value.strip().strip('"').strip("'")
 
     return env_vars
+
+
+def is_cli_available(cli_name: str) -> bool:
+    """Check if a CLI tool is available in the system PATH."""
+    return shutil.which(cli_name) is not None
+
+
+def query_gemini_cli(prompt: str, timeout: int = 60) -> Tuple[bool, str]:
+    """
+    Query Gemini using gemini-cli.
+    Returns (success, response_or_error).
+    """
+    try:
+        result = subprocess.run(
+            ["gemini", "-p", prompt],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        if result.returncode == 0:
+            return True, result.stdout.strip()
+        else:
+            return False, f"gemini-cli error: {result.stderr.strip()}"
+    except subprocess.TimeoutExpired:
+        return False, "gemini-cli timed out"
+    except Exception as e:
+        return False, f"gemini-cli exception: {str(e)}"
+
+
+def query_codex_cli(prompt: str, timeout: int = 60) -> Tuple[bool, str]:
+    """
+    Query ChatGPT using OpenAI's codex CLI.
+    Returns (success, response_or_error).
+    """
+    try:
+        result = subprocess.run(
+            ["codex", "-p", prompt],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        if result.returncode == 0:
+            return True, result.stdout.strip()
+        else:
+            return False, f"codex error: {result.stderr.strip()}"
+    except subprocess.TimeoutExpired:
+        return False, "codex timed out"
+    except Exception as e:
+        return False, f"codex exception: {str(e)}"
 
 
 def query_openai(prompt: str, api_key: str, model: str = "gpt-5-nano") -> Optional[str]:
@@ -102,25 +158,51 @@ def main():
         or "gemini-3-flash-preview"
     )
 
-    # Query both APIs
+    # Check CLI availability
+    gemini_cli_available = is_cli_available("gemini")
+    codex_cli_available = is_cli_available("codex")
+
+    # Query ChatGPT: try codex CLI first, fallback to API
     chatgpt_response = None
+    chatgpt_source = None
+
+    if codex_cli_available:
+        success, response = query_codex_cli(prompt)
+        if success:
+            chatgpt_response = response
+            chatgpt_source = "codex-cli"
+
+    if chatgpt_response is None:
+        if openai_key:
+            chatgpt_response = query_openai(prompt, openai_key, openai_model)
+            chatgpt_source = f"api ({openai_model})"
+        else:
+            chatgpt_response = "Error: codex CLI not available and OPENAI_API_KEY not found"
+            chatgpt_source = "none"
+
+    # Query Gemini: try gemini-cli first, fallback to API
     gemini_response = None
+    gemini_source = None
 
-    if openai_key:
-        chatgpt_response = query_openai(prompt, openai_key, openai_model)
-    else:
-        chatgpt_response = "Error: OPENAI_API_KEY not found in .env file or environment"
+    if gemini_cli_available:
+        success, response = query_gemini_cli(prompt)
+        if success:
+            gemini_response = response
+            gemini_source = "gemini-cli"
 
-    if gemini_key:
-        gemini_response = query_gemini(prompt, gemini_key, gemini_model)
-    else:
-        gemini_response = "Error: GEMINI_API_KEY not found in .env file or environment"
+    if gemini_response is None:
+        if gemini_key:
+            gemini_response = query_gemini(prompt, gemini_key, gemini_model)
+            gemini_source = f"api ({gemini_model})"
+        else:
+            gemini_response = "Error: gemini CLI not available and GEMINI_API_KEY not found"
+            gemini_source = "none"
 
     # Output as JSON
     result = {
         "prompt": prompt,
-        "chatgpt": {"model": openai_model, "response": chatgpt_response},
-        "gemini": {"model": gemini_model, "response": gemini_response},
+        "chatgpt": {"model": openai_model, "source": chatgpt_source, "response": chatgpt_response},
+        "gemini": {"model": gemini_model, "source": gemini_source, "response": gemini_response},
     }
 
     print(json.dumps(result, indent=2))
